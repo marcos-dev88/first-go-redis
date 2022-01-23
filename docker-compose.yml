@@ -1,0 +1,37 @@
+version: '3.4'
+services:
+  redis_cache:
+    image: "redis:alpine"
+    container_name: redis-cache-poc-go
+    env_file: "./.env"
+    command: redis-server /usr/local/etc/redis/redis.conf --requirepass ${REDIS_PASS} --port 6079
+    ports:
+      - "6079:6379"
+    expose:
+      - "6079"
+    volumes:
+    - $PWD/redis/.conf:/usr/local/etc/redis/redis.conf
+    networks:
+      net:
+        ipv4_address: 172.26.0.5
+
+  redis-poc-app:
+    build:
+      dockerfile: ./docker/Dockerfile_app
+      context: .
+    container_name: go-redis-poc-app
+    depends_on:
+    - redis_cache
+    env_file: "./.env"
+    ports:
+    - "8075:8075"
+    networks:
+      net:
+        ipv4_address: 172.26.0.4
+
+networks:
+  net:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.26.0.0/24

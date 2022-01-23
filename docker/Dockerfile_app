@@ -1,0 +1,13 @@
+FROM golang:1.17.0
+
+WORKDIR /go/src/redis_poc
+
+COPY . .
+
+ENV GOPATH=/go
+
+RUN go build -ldflags "-s -w" -o bin/redis_poc cmd/*.go
+
+ENTRYPOINT [ "./bin/redis_poc", "server" ]
+
+EXPOSE 8075
